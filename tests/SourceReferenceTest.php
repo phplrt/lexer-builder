@@ -14,9 +14,6 @@ use PHPUnit\Framework\Attributes\TestDox;
 #[Group('phplrt/lexer-compiler')]
 final class SourceReferenceTest extends TestCase
 {
-    /**
-     * @var non-empty-string
-     */
     private const string SOURCE = "%token T_NAME [a-z]++\n%token T_END \" -> default\n";
 
     #[TestDox('A definition refers to the source it has been written in')]
@@ -103,7 +100,7 @@ final class SourceReferenceTest extends TestCase
             $lexer->build();
         } catch (CompilationFailedException $e) {
             self::assertNull($e->context);
-            self::assertStringStartsWith(CompilationFailedException::class, (string) $e);
+            self::assertStringStartsWith('error[CompilationFailedException]: ', (string) $e);
 
             return;
         }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Phplrt\Lexer\Builder\Exception;
 
 use Phplrt\Contracts\Lexer\LexerInterface;
-use Phplrt\Contracts\Source\Exception\SourceExceptionInterface;
 use Phplrt\Exception\ErrorPrinter;
 use Phplrt\Lexer\Builder\Definition\SourceReference;
 
@@ -28,18 +27,18 @@ class LexerCompilerException extends \Exception
     {
         $context = $this->context;
 
-        if ($context === null) {
-            return parent::__toString();
-        }
-
         try {
-            return (string) new ErrorPrinter()
-                ->print($context->source, $context->offset, $context->length)
-                ->withMessage($this->getMessage())
-                ->withClass(static::class);
-        } catch (SourceExceptionInterface) {
-            // The source code the error refers to is gone, so there is nothing
-            // left to show around it.
+            $result = new ErrorPrinter()
+                ->print($this);
+
+            if ($context !== null) {
+                $result = $result
+                    ->withSource($context->source)
+                    ->withInterval($context->offset, $context->length);
+            }
+
+            return (string) $result;
+        } catch (\Throwable) {
             return parent::__toString();
         }
     }
